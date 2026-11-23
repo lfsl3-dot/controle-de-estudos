@@ -1,0 +1,15 @@
+# Segredos: NUNCA enviar para o GitHub
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Logs locais
+*.log
