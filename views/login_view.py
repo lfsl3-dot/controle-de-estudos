@@ -9,53 +9,50 @@ class LoginView:
         self.ao_entrar = ao_entrar
         self.modo_cadastro = False
 
-        self.titulo = ft.Text("Entrar", size=24, weight=ft.FontWeight.BOLD)
-        self.nome = ft.TextField(label="Nome", max_length=80, visible=False)
-        self.email = ft.TextField(
-            label="E-mail", keyboard_type=ft.KeyboardType.EMAIL, max_length=254, autofocus=True
-        )
-        self.senha = ft.TextField(
-            label="Senha", password=True, can_reveal_password=True, max_length=72,
-            on_submit=self._enviar,
-        )
-        self.confirmacao = ft.TextField(
-            label="Confirme a senha", password=True, can_reveal_password=True,
-            max_length=72, visible=False, on_submit=self._enviar,
-        )
+        self.titulo = ft.Text("Bem-vindo de volta", size=26, weight=ft.FontWeight.BOLD, color=ft.Colors.INDIGO_900)
+        self.nome = ft.TextField(label="Nome", max_length=80, visible=False, prefix_icon=ft.Icons.PERSON_OUTLINE, border_radius=12)
+        self.email = ft.TextField(label="E-mail", keyboard_type=ft.KeyboardType.EMAIL, max_length=254, autofocus=True, prefix_icon=ft.Icons.MAIL_OUTLINE, border_radius=12)
+        self.senha = ft.TextField(label="Senha", password=True, can_reveal_password=True, max_length=72, prefix_icon=ft.Icons.LOCK_OUTLINE, border_radius=12, on_submit=self._enviar)
+        self.confirmacao = ft.TextField(label="Confirme a senha", password=True, can_reveal_password=True, max_length=72, visible=False, prefix_icon=ft.Icons.VERIFIED_USER_OUTLINE, border_radius=12, on_submit=self._enviar)
         self.mensagem = ft.Text("", color=ft.Colors.RED_700)
-        self.botao = ft.Button(content="Entrar", icon=ft.Icons.LOGIN, on_click=self._enviar)
-        self.alternar = ft.TextButton(
-            content="Ainda não tem conta? Cadastre-se", on_click=self._alternar_modo
-        )
+        self.botao = ft.Button(content="Entrar", icon=ft.Icons.LOGIN, height=46, style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=12), bgcolor=ft.Colors.INDIGO_600, color=ft.Colors.WHITE), on_click=self._enviar)
+        self.alternar = ft.TextButton(content="Ainda não tem conta? Cadastre-se", style=ft.ButtonStyle(color=ft.Colors.INDIGO_700), on_click=self._alternar_modo)
 
     def build(self) -> ft.Control:
-        return ft.Column(
+        return ft.Container(
             expand=True,
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[
-                ft.Card(
-                    content=ft.Container(
-                        width=380,
-                        padding=24,
-                        content=ft.Column(
-                            tight=True,
-                            spacing=12,
-                            controls=[
-                                ft.Text("Controle de Estudos", size=14, color=ft.Colors.GREY_700),
-                                self.titulo,
-                                self.nome,
-                                self.email,
-                                self.senha,
-                                self.confirmacao,
-                                self.mensagem,
-                                self.botao,
-                                self.alternar,
-                            ],
-                        ),
-                    )
-                )
-            ],
+            gradient=ft.LinearGradient(begin=ft.alignment.top_left, end=ft.alignment.bottom_right, colors=[ft.Colors.INDIGO_50, ft.Colors.BLUE_50, ft.Colors.WHITE]),
+            alignment=ft.alignment.center,
+            padding=24,
+            content=ft.Card(
+                elevation=12,
+                surface_tint_color=ft.Colors.TRANSPARENT,
+                shape=ft.RoundedRectangleBorder(radius=20),
+                content=ft.Container(
+                    width=410,
+                    padding=32,
+                    bgcolor=ft.Colors.WHITE,
+                    border_radius=20,
+                    content=ft.Column(
+                        tight=True,
+                        spacing=13,
+                        controls=[
+                            ft.Container(width=52, height=52, border_radius=16, gradient=ft.LinearGradient(begin=ft.alignment.top_left, end=ft.alignment.bottom_right, colors=[ft.Colors.INDIGO_600, ft.Colors.BLUE_500]), alignment=ft.alignment.center, content=ft.Icon(ft.Icons.MENU_BOOK, color=ft.Colors.WHITE, size=28)),
+                            ft.Text("Controle de Estudos", size=14, weight=ft.FontWeight.W_600, color=ft.Colors.INDIGO_600),
+                            self.titulo,
+                            ft.Text("Organize matérias, estudos e seu progresso.", size=13, color=ft.Colors.GREY_600),
+                            ft.Container(height=4),
+                            self.nome,
+                            self.email,
+                            self.senha,
+                            self.confirmacao,
+                            self.mensagem,
+                            self.botao,
+                            ft.Container(alignment=ft.alignment.center, content=self.alternar),
+                        ],
+                    ),
+                ),
+            ),
         )
 
     # ------------------------------------------------------------------
@@ -67,10 +64,10 @@ class LoginView:
     def _alternar_modo(self, e=None) -> None:
         self.modo_cadastro = not self.modo_cadastro
         cadastro = self.modo_cadastro
-        self.titulo.value = "Criar conta" if cadastro else "Entrar"
+        self.titulo.value = "Criar sua conta" if cadastro else "Bem-vindo de volta"
         self.nome.visible = cadastro
         self.confirmacao.visible = cadastro
-        self.botao.content = "Cadastrar" if cadastro else "Entrar"
+        self.botao.content = "Criar conta" if cadastro else "Entrar"
         self.alternar.content = "Já tenho conta. Entrar" if cadastro else "Ainda não tem conta? Cadastre-se"
         self.mensagem.value = ""
         self.page.update()

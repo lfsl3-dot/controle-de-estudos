@@ -15,7 +15,7 @@ from views.login_view import LoginView
 from views.principal_view import PrincipalView
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) 
 
 
 def _porta_disponivel(porta: int) -> bool:
@@ -49,14 +49,23 @@ def _resolver_porta() -> int:
 def main(page: ft.Page):
     page.title = "Controle de Estudos"
     page.theme_mode = ft.ThemeMode.LIGHT
-    page.padding = 20
+    page.padding = 0
+    page.bgcolor = ft.Colors.SURFACE
+    page.fonts = {"Inter": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTcviYwY.woff2"}
+    page.theme = ft.Theme(font_family="Inter", color_scheme_seed=ft.Colors.INDIGO)
 
-    # Falha de configuracao: avisa de forma simples (detalhes so no log do servidor)
     try:
         controller = AppController()
     except Exception:
         logger.exception("Falha ao iniciar o sistema (confira as variaveis de ambiente)")
-        page.add(ft.Text("Sistema indisponível no momento. Tente novamente mais tarde."))
+        page.add(
+            ft.Container(
+                expand=True,
+                alignment=ft.alignment.center,
+                bgcolor=ft.Colors.SURFACE,
+                content=ft.Text("Sistema indisponível no momento. Tente novamente mais tarde."),
+            )
+        )
         return
 
     def mostrar_login(aviso: str | None = None) -> None:
@@ -68,20 +77,53 @@ def main(page: ft.Page):
             mostrar_aviso(page, aviso, erro=True)
 
     def sair(e=None) -> None:
-        controller.sair()  # sign_out no Supabase + apaga o usuario da memoria
+        controller.sair()
         mostrar_login()
 
     def mostrar_principal() -> None:
-        # Bloqueio de tela interna sem login (rotina 3)
         if controller.usuario_atual is None:
             mostrar_login()
             return
+
+        nome = controller.usuario_atual.get("nome") or controller.usuario_atual["email"]
         page.appbar = ft.AppBar(
-            title=ft.Text("Controle de Estudos"),
+            bgcolor=ft.Colors.WHITE,
+            surface_tint_color=ft.Colors.TRANSPARENT,
+            title=ft.Row(
+                tight=True,
+                controls=[
+                    ft.Container(
+                        width=38,
+                        height=38,
+                        border_radius=12,
+                        gradient=ft.LinearGradient(
+                            begin=ft.alignment.top_left,
+                            end=ft.alignment.bottom_right,
+                            colors=[ft.Colors.INDIGO_600, ft.Colors.BLUE_500],
+                        ),
+                        alignment=ft.alignment.center,
+                        content=ft.Icon(ft.Icons.MENU_BOOK, color=ft.Colors.WHITE, size=20),
+                    ),
+                    ft.Text("Controle de Estudos", weight=ft.FontWeight.BOLD, size=18),
+                ],
+            ),
             center_title=False,
             actions=[
-                ft.Text(controller.usuario_atual.get("nome") or controller.usuario_atual["email"]),
-                ft.IconButton(icon=ft.Icons.LOGOUT, tooltip="Sair", on_click=sair),
+                ft.Container(
+                    border=ft.border.all(1, ft.Colors.INDIGO_100),
+                    border_radius=20,
+                    bgcolor=ft.Colors.INDIGO_50,
+                    padding=ft.padding.symmetric(horizontal=12, vertical=8),
+                    content=ft.Row(
+                        tight=True,
+                        spacing=6,
+                        controls=[
+                            ft.Icon(ft.Icons.PERSON_OUTLINE, size=16, color=ft.Colors.INDIGO_700),
+                            ft.Text(nome, size=13, weight=ft.FontWeight.W_600, color=ft.Colors.INDIGO_900),
+                        ],
+                    ),
+                ),
+                ft.IconButton(icon=ft.Icons.LOGOUT_ROUNDED, tooltip="Sair", on_click=sair),
                 ft.Container(width=8),
             ],
         )

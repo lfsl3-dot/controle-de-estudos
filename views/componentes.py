@@ -3,11 +3,20 @@ import flet as ft
 
 
 def mostrar_aviso(page: ft.Page, mensagem: str, erro: bool = False) -> None:
-    """Aviso simples (SnackBar) verde para sucesso e vermelho para erro."""
+    """Aviso simples e moderno com cor de sucesso ou erro."""
     page.show_dialog(
         ft.SnackBar(
-            content=ft.Text(mensagem),
+            content=ft.Row(
+                tight=True,
+                spacing=8,
+                controls=[
+                    ft.Icon(ft.Icons.ERROR_OUTLINE if erro else ft.Icons.CHECK_CIRCLE_OUTLINE, color=ft.Colors.WHITE),
+                    ft.Text(mensagem, weight=ft.FontWeight.W_600, color=ft.Colors.WHITE),
+                ],
+            ),
             bgcolor=ft.Colors.RED_700 if erro else ft.Colors.GREEN_700,
+            behavior=ft.SnackBarBehavior.FLOATING,
+            shape=ft.RoundedRectangleBorder(radius=12),
         )
     )
 

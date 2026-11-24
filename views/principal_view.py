@@ -27,14 +27,22 @@ class PrincipalView:
         self.ao_sessao_perdida = ao_sessao_perdida
         self.secao = "estudos"
         self.menu = ft.Row(spacing=8, wrap=True)
-        self.area = ft.Column(expand=True, scroll=ft.ScrollMode.AUTO, spacing=12)
+        self.area = ft.Column(expand=True, scroll=ft.ScrollMode.AUTO, spacing=14)
         self.raiz = ft.Column(
-            expand=True, spacing=12, controls=[self.menu, ft.Divider(), self.area]
+            expand=True,
+            spacing=12,
+            controls=[self.menu, ft.Container(height=1, bgcolor=ft.Colors.INDIGO_50), self.area],
         )
 
     def build(self) -> ft.Control:
         self._atualizar(atualizar_pagina=False)
-        return self.raiz
+        return ft.Container(
+            expand=True,
+            bgcolor=ft.Colors.SURFACE,
+            padding=ft.padding.symmetric(horizontal=24, vertical=18),
+            alignment=ft.alignment.top_center,
+            content=ft.Container(expand=True, width=1100, content=self.raiz),
+        )
 
     # ------------------------------------------------------------------
     # Navegacao e utilitarios
@@ -58,14 +66,29 @@ class PrincipalView:
     def _montar_menu(self) -> None:
         self.menu.controls.clear()
         opcoes = [
-            ("estudos", "Estudos", ft.Icons.MENU_BOOK),
-            ("materias", "Matérias", ft.Icons.FOLDER),
-            ("perfil", "Meu perfil", ft.Icons.PERSON),
+            ("estudos", "Estudos", ft.Icons.MENU_BOOK_OUTLINED),
+            ("materias", "Matérias", ft.Icons.FOLDER_OUTLINED),
+            ("perfil", "Meu perfil", ft.Icons.PERSON_OUTLINED),
         ]
         for chave, rotulo, icone in opcoes:
-            tipo = ft.Button if chave == self.secao else ft.OutlinedButton
+            ativa = chave == self.secao
             self.menu.controls.append(
-                tipo(content=rotulo, icon=icone, on_click=lambda e, c=chave: self._ir_para(c))
+                ft.Container(
+                    border_radius=12,
+                    bgcolor=ft.Colors.INDIGO_600 if ativa else ft.Colors.WHITE,
+                    border=ft.border.all(1, ft.Colors.INDIGO_200 if ativa else ft.Colors.GREY_300),
+                    padding=ft.padding.symmetric(horizontal=14, vertical=8),
+                    ink=True,
+                    on_click=lambda e, c=chave: self._ir_para(c),
+                    content=ft.Row(
+                        tight=True,
+                        spacing=7,
+                        controls=[
+                            ft.Icon(icone, size=18, color=ft.Colors.WHITE if ativa else ft.Colors.INDIGO_700),
+                            ft.Text(rotulo, weight=ft.FontWeight.W_600, size=13, color=ft.Colors.WHITE if ativa else ft.Colors.INDIGO_900),
+                        ],
+                    ),
+                )
             )
 
     def _falha(self, mensagem: str) -> None:
@@ -92,53 +115,41 @@ class PrincipalView:
         self.area.controls.append(
             ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
-                    ft.Text("Meus estudos", size=22, weight=ft.FontWeight.BOLD),
-                    ft.Button(
-                        content="Novo estudo",
-                        icon=ft.Icons.ADD,
-                        disabled=not materias,
-                        on_click=lambda e: self._abrir_form_estudo(materias),
-                    ),
+                    ft.Column(tight=True, spacing=2, controls=[ft.Text("Meus estudos", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.INDIGO_900), ft.Text("Acompanhe sua rotina de estudos", size=13, color=ft.Colors.GREY_600)]),
+                    ft.Button(content="Novo estudo", icon=ft.Icons.ADD_ROUNDED, height=42, disabled=not materias, style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=12), bgcolor=ft.Colors.INDIGO_600, color=ft.Colors.WHITE), on_click=lambda e: self._abrir_form_estudo(materias)),
                 ],
             )
         )
         if not materias:
-            self.area.controls.append(
-                ft.Text(
-                    "Cadastre uma matéria na aba “Matérias” antes de criar seus estudos.",
-                    color=ft.Colors.ORANGE_800,
-                )
-            )
+            self.area.controls.append(ft.Container(padding=12, border_radius=12, bgcolor=ft.Colors.ORANGE_50, border=ft.border.all(1, ft.Colors.ORANGE_100), content=ft.Row(spacing=8, controls=[ft.Icon(ft.Icons.INFO_OUTLINE, color=ft.Colors.ORANGE_800, size=18), ft.Text("Cadastre uma matéria na aba “Matérias” antes de criar seus estudos.", color=ft.Colors.ORANGE_900, size=13)])))
         self.area.controls.append(
-            ft.Row(
-                wrap=True,
-                spacing=10,
-                controls=[
-                    self._bloco_resumo(resumo["pendente"], "Pendentes"),
-                    self._bloco_resumo(resumo["em_andamento"], "Em andamento"),
-                    self._bloco_resumo(resumo["concluido"], "Concluídos"),
-                    self._bloco_resumo(resumo["minutos"], "Minutos planejados"),
-                ],
-            )
+            ft.Row(wrap=True, spacing=10, controls=[
+                self._bloco_resumo(resumo["pendente"], "Pendentes", ft.Colors.ORANGE),
+                self._bloco_resumo(resumo["em_andamento"], "Em andamento", ft.Colors.BLUE),
+                self._bloco_resumo(resumo["concluido"], "Concluídos", ft.Colors.GREEN),
+                self._bloco_resumo(resumo["minutos"], "Minutos planejados", ft.Colors.INDIGO),
+            ])
         )
         if not estudos:
-            self.area.controls.append(ft.Text("Nenhum estudo cadastrado ainda."))
+            self.area.controls.append(ft.Container(padding=20, border_radius=14, bgcolor=ft.Colors.WHITE, border=ft.border.all(1, ft.Colors.GREY_200), alignment=ft.alignment.center, content=ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, tight=True, controls=[ft.Icon(ft.Icons.MENU_BOOK_OUTLINED, size=38, color=ft.Colors.INDIGO_300), ft.Text("Nenhum estudo cadastrado ainda", weight=ft.FontWeight.W_600, color=ft.Colors.GREY_700)])))
         for estudo in estudos:
             self.area.controls.append(self._cartao_estudo(estudo, materias))
 
     @staticmethod
-    def _bloco_resumo(valor, rotulo: str) -> ft.Control:
+    def _bloco_resumo(valor, rotulo: str, cor) -> ft.Control:
         return ft.Container(
-            padding=12,
-            border_radius=8,
-            bgcolor=ft.Colors.BLUE_50,
-            content=ft.Column(
-                tight=True,
-                spacing=0,
+            width=210,
+            padding=14,
+            border_radius=14,
+            bgcolor=ft.Colors.WHITE,
+            border=ft.border.all(1, ft.Colors.GREY_200),
+            content=ft.Row(
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
-                    ft.Text(str(valor), size=22, weight=ft.FontWeight.BOLD),
-                    ft.Text(rotulo, size=12),
+                    ft.Column(tight=True, spacing=2, controls=[ft.Text(str(valor), size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.INDIGO_900), ft.Text(rotulo, size=12, color=ft.Colors.GREY_600)]),
+                    ft.Container(width=38, height=38, border_radius=12, bgcolor=cor if False else ft.Colors.INDIGO_50, alignment=ft.alignment.center, content=ft.Icon(ft.Icons.TRENDING_UP_ROUNDED, color=ft.Colors.INDIGO_600, size=20)),
                 ],
             ),
         )
