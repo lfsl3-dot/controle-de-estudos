@@ -13,7 +13,7 @@ class LoginView:
         self.nome = ft.TextField(label="Nome", max_length=80, visible=False, prefix_icon=ft.Icons.PERSON_OUTLINE, border_radius=12)
         self.email = ft.TextField(label="E-mail", keyboard_type=ft.KeyboardType.EMAIL, max_length=254, autofocus=True, prefix_icon=ft.Icons.MAIL_OUTLINE, border_radius=12)
         self.senha = ft.TextField(label="Senha", password=True, can_reveal_password=True, max_length=72, prefix_icon=ft.Icons.LOCK_OUTLINE, border_radius=12, on_submit=self._enviar)
-        self.confirmacao = ft.TextField(label="Confirme a senha", password=True, can_reveal_password=True, max_length=72, visible=False, prefix_icon=ft.Icons.VERIFIED_USER_OUTLINE, border_radius=12, on_submit=self._enviar)
+        self.confirmacao = ft.TextField(label="Confirme a senha", password=True, can_reveal_password=True, max_length=72, visible=False, prefix_icon=ft.Icons.VERIFIED_USER_OUTLINED, border_radius=12, on_submit=self._enviar)
         self.mensagem = ft.Text("", color=ft.Colors.RED_700)
         self.botao = ft.Button(content="Entrar", icon=ft.Icons.LOGIN, height=46, style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=12), bgcolor=ft.Colors.INDIGO_600, color=ft.Colors.WHITE), on_click=self._enviar)
         self.alternar = ft.TextButton(content="Ainda não tem conta? Cadastre-se", style=ft.ButtonStyle(color=ft.Colors.INDIGO_700), on_click=self._alternar_modo)
