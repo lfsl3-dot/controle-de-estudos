@@ -21,6 +21,10 @@ MSG_ERRO_GENERICO = "Não foi possível concluir a operação agora. Tente novam
 MSG_SESSAO_EXPIRADA = "Sua sessão expirou. Entre novamente."
 MAX_FALHAS_LOGIN = 5
 SEGUNDOS_BLOQUEIO = 30
+MAX_CADASTROS = 5
+SEGUNDOS_CADASTRO_BLOQUEIO = 60
+MAX_MUTACOES = 20
+SEGUNDOS_MUTACOES = 10
 
 
 def requer_login(metodo):
@@ -31,6 +35,15 @@ def requer_login(metodo):
         if not self.sessao_ativa():
             self.usuario_atual = None
             return False, MSG_SESSAO_EXPIRADA, None
+        if metodo.__name__.startswith(("criar_", "atualizar_", "excluir_")):
+            agora = time.monotonic()
+            if agora < self._bloqueado_mutacao_ate:
+                return False, "Muitas operações. Aguarde alguns segundos e tente de novo.", None
+            self._mutacoes += 1
+            if self._mutacoes >= MAX_MUTACOES:
+                self._bloqueado_mutacao_ate = agora + SEGUNDOS_MUTACOES
+                self._mutacoes = 0
+                return False, "Muitas operações. Aguarde alguns segundos e tente de novo.", None
         return metodo(self, *args, **kwargs)
 
     return interno
@@ -46,6 +59,10 @@ class AppController:
         self.usuario_atual: dict | None = None
         self._falhas_login = 0
         self._bloqueado_ate = 0.0
+        self._cadastros = 0
+        self._bloqueado_cadastro_ate = 0.0
+        self._mutacoes = 0
+        self._bloqueado_mutacao_ate = 0.0
 
     # ------------------------------------------------------------------
     # Sessao
@@ -93,6 +110,8 @@ class AppController:
         return True, "Login realizado com sucesso.", self.usuario_atual
 
     def cadastrar(self, nome, email, senha, confirmacao):
+        if time.monotonic() < self._bloqueado_cadastro_ate:
+            return False, "Muitos cadastros. Aguarde alguns segundos e tente de novo.", None
         nome_limpo, erro = v.validar_texto(nome, "nome", 2, 80)
         if erro:
             return False, erro, None
@@ -108,7 +127,12 @@ class AppController:
             self.usuarios.cadastrar(nome_limpo, v.limpar(email).lower(), senha)
         except Exception:
             logger.exception("Falha no cadastro")
+            self._cadastros += 1
+            if self._cadastros >= MAX_CADASTROS:
+                self._bloqueado_cadastro_ate = time.monotonic() + SEGUNDOS_CADASTRO_BLOQUEIO
+                self._cadastros = 0
             return False, "Não foi possível concluir o cadastro. Revise os dados e tente de novo.", None
+        self._cadastros = 0
         return True, "Cadastro realizado! Se pedirem, confirme seu e-mail. Depois, entre no sistema.", None
 
     def sair(self) -> None:

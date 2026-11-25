@@ -8,6 +8,10 @@ import os
 import socket
 
 import flet as ft
+import fastapi
+import flet.controls.alignment as alignment_module
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from controllers.app_controller import AppController
 from views.componentes import mostrar_aviso
@@ -16,6 +20,34 @@ from views.principal_view import PrincipalView
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__) 
+
+# Flet 1.0.1 exposes uppercase alignment constants, while some render paths
+# may still call the legacy lowercase API. Keep both compatible.
+if not hasattr(alignment_module, "center"):
+    alignment_module.center = lambda: alignment_module.Alignment(0, 0)
+if not hasattr(alignment_module.Alignment, "center"):
+    alignment_module.Alignment.center = staticmethod(lambda: alignment_module.Alignment(0, 0))
+
+
+class CabecalhosSeguranca(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        resposta = await call_next(request)
+        resposta.headers["X-Content-Type-Options"] = "nosniff"
+        resposta.headers["X-Frame-Options"] = "DENY"
+        resposta.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        resposta.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
+        resposta.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        resposta.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+        resposta.headers["Cache-Control"] = "no-store, max-age=0"
+        resposta.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.gstatic.com; "
+            "font-src 'self' data: https://www.gstatic.com https://fonts.gstatic.com; connect-src 'self' ws: wss: https://*.supabase.co https://www.gstatic.com https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+            "worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        )
+        if request.url.scheme == "https":
+            resposta.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return resposta
 
 
 def _porta_disponivel(porta: int) -> bool:
@@ -46,6 +78,21 @@ def _resolver_porta() -> int:
     raise RuntimeError("Não foi possível encontrar uma porta livre para iniciar o Flet.")
 
 
+# Flet 1.0.1 passa o argumento openapi_prefix obsoleto.
+# Remova-o antes que o FastAPI moderno receba as opções do construtor.
+_fastapi_init = fastapi.FastAPI.__init__
+
+
+def _fastapi_init_compat(self, *args, **kwargs):
+    kwargs.pop("openapi_prefix", None)
+    middleware = list(kwargs.get("middleware") or [])
+    middleware.insert(0, Middleware(CabecalhosSeguranca))
+    kwargs["middleware"] = middleware
+    _fastapi_init(self, *args, **kwargs)
+
+
+fastapi.FastAPI.__init__ = _fastapi_init_compat
+
 def main(page: ft.Page):
     page.title = "Controle de Estudos"
     page.theme_mode = ft.ThemeMode.LIGHT
@@ -53,6 +100,36 @@ def main(page: ft.Page):
     page.bgcolor = ft.Colors.SURFACE
     page.fonts = {"Inter": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTcviYwY.woff2"}
     page.theme = ft.Theme(font_family="Inter", color_scheme_seed=ft.Colors.INDIGO)
+
+    # Compatibilidade com versões anteriores que usam ft.alignment.center,
+    # e com Flet 1.0.1 que expõe Alignment.CENTER.
+    def _alignment_center():
+        return alignment_module.Alignment(0, 0)
+
+    if not hasattr(alignment_module, "center"):
+        alignment_module.center = _alignment_center
+    if not hasattr(alignment_module.Alignment, "center"):
+        alignment_module.Alignment.center = staticmethod(_alignment_center)
+
+    if not hasattr(ft, "alignment"):
+        ft.alignment = alignment_module
+    else:
+        for nome in ("center", "top_center", "top_left", "top_right",
+                     "bottom_center", "bottom_left", "bottom_right",
+                     "center_left", "center_right"):
+            if not hasattr(ft.alignment, nome):
+                valor = {
+                    "center": _alignment_center,
+                    "top_center": lambda: alignment_module.Alignment(0, -1),
+                    "top_left": lambda: alignment_module.Alignment(-1, -1),
+                    "top_right": lambda: alignment_module.Alignment(1, -1),
+                    "bottom_center": lambda: alignment_module.Alignment(0, 1),
+                    "bottom_left": lambda: alignment_module.Alignment(-1, 1),
+                    "bottom_right": lambda: alignment_module.Alignment(1, 1),
+                    "center_left": lambda: alignment_module.Alignment(-1, 0),
+                    "center_right": lambda: alignment_module.Alignment(1, 0),
+                }[nome]
+                setattr(ft.alignment, nome, valor)
 
     try:
         controller = AppController()
@@ -128,7 +205,7 @@ def main(page: ft.Page):
             ],
         )
         page.controls.clear()
-        page.add(PrincipalView(page, controller, ao_sessao_perdida=mostrar_login).build())
+        page.add(PrincipalView(page, controller, ao_sessao_perdida=mostrar_login, ao_sair=sair).build())
         page.update()
 
     mostrar_login()

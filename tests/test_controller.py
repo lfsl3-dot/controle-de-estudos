@@ -130,6 +130,15 @@ class TestCrud(unittest.TestCase):
         self.assertEqual(msg, ac.MSG_ERRO_GENERICO)
         self.assertNotIn("estudos", msg)
 
+    def test_mutacoes_repetidas_sao_bloqueadas(self):
+        c = criar_e_entrar(self.banco)
+        mid = c.criar_materia("Matéria", "")
+        self.assertTrue(mid[0])
+        c._mutacoes = ac.MAX_MUTACOES - 1
+        ok, msg, _ = c.criar_materia("Nova matéria", "")
+        self.assertFalse(ok)
+        self.assertIn("Muitas operações", msg)
+
 
 class TestIsolamento(unittest.TestCase):
     def test_conta_b_nao_ve_nem_altera_dados_da_conta_a(self):
