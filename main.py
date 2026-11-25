@@ -126,7 +126,6 @@ def main(page: ft.Page):
         nome = controller.usuario_atual.get("nome") or controller.usuario_atual["email"]
         page.appbar = ft.AppBar(
             bgcolor=ft.Colors.WHITE,
-            surface_tint_color=ft.Colors.TRANSPARENT,
             title=ft.Row(
                 tight=True,
                 controls=[

@@ -26,7 +26,6 @@ class LoginView:
             padding=24,
             content=ft.Card(
                 elevation=12,
-                surface_tint_color=ft.Colors.TRANSPARENT,
                 shape=ft.RoundedRectangleBorder(radius=20),
                 content=ft.Container(
                     width=410,
