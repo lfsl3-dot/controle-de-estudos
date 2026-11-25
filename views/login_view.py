@@ -21,8 +21,8 @@ class LoginView:
     def build(self) -> ft.Control:
         return ft.Container(
             expand=True,
-            gradient=ft.LinearGradient(begin=ft.alignment.top_left, end=ft.alignment.bottom_right, colors=[ft.Colors.INDIGO_50, ft.Colors.BLUE_50, ft.Colors.WHITE]),
-            alignment=ft.alignment.center,
+            gradient=ft.LinearGradient(begin=ft.Alignment.TOP_LEFT, end=ft.Alignment.BOTTOM_RIGHT, colors=[ft.Colors.INDIGO_50, ft.Colors.BLUE_50, ft.Colors.WHITE]),
+            alignment=ft.Alignment.CENTER,
             padding=24,
             content=ft.Card(
                 elevation=12,
@@ -37,7 +37,7 @@ class LoginView:
                         tight=True,
                         spacing=13,
                         controls=[
-                            ft.Container(width=52, height=52, border_radius=16, gradient=ft.LinearGradient(begin=ft.alignment.top_left, end=ft.alignment.bottom_right, colors=[ft.Colors.INDIGO_600, ft.Colors.BLUE_500]), alignment=ft.alignment.center, content=ft.Icon(ft.Icons.MENU_BOOK, color=ft.Colors.WHITE, size=28)),
+                            ft.Container(width=52, height=52, border_radius=16, gradient=ft.LinearGradient(begin=ft.Alignment.TOP_LEFT, end=ft.Alignment.BOTTOM_RIGHT, colors=[ft.Colors.INDIGO_600, ft.Colors.BLUE_500]), alignment=ft.Alignment.CENTER, content=ft.Icon(ft.Icons.MENU_BOOK, color=ft.Colors.WHITE, size=28)),
                             ft.Text("Controle de Estudos", size=14, weight=ft.FontWeight.W_600, color=ft.Colors.INDIGO_600),
                             self.titulo,
                             ft.Text("Organize matérias, estudos e seu progresso.", size=13, color=ft.Colors.GREY_600),
@@ -48,7 +48,7 @@ class LoginView:
                             self.confirmacao,
                             self.mensagem,
                             self.botao,
-                            ft.Container(alignment=ft.alignment.center, content=self.alternar),
+                            ft.Container(alignment=ft.Alignment.CENTER, content=self.alternar),
                         ],
                     ),
                 ),

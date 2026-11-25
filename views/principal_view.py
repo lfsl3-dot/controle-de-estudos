@@ -40,7 +40,7 @@ class PrincipalView:
             expand=True,
             bgcolor=ft.Colors.SURFACE,
             padding=ft.padding.symmetric(horizontal=24, vertical=18),
-            alignment=ft.alignment.top_center,
+            alignment=ft.Alignment.TOP_CENTER,
             content=ft.Container(expand=True, width=1100, content=self.raiz),
         )
 
@@ -133,7 +133,7 @@ class PrincipalView:
             ])
         )
         if not estudos:
-            self.area.controls.append(ft.Container(padding=20, border_radius=14, bgcolor=ft.Colors.WHITE, border=ft.border.all(1, ft.Colors.GREY_200), alignment=ft.alignment.center, content=ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, tight=True, controls=[ft.Icon(ft.Icons.MENU_BOOK_OUTLINED, size=38, color=ft.Colors.INDIGO_300), ft.Text("Nenhum estudo cadastrado ainda", weight=ft.FontWeight.W_600, color=ft.Colors.GREY_700)])))
+            self.area.controls.append(ft.Container(padding=20, border_radius=14, bgcolor=ft.Colors.WHITE, border=ft.border.all(1, ft.Colors.GREY_200), alignment=ft.Alignment.CENTER, content=ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, tight=True, controls=[ft.Icon(ft.Icons.MENU_BOOK_OUTLINED, size=38, color=ft.Colors.INDIGO_300), ft.Text("Nenhum estudo cadastrado ainda", weight=ft.FontWeight.W_600, color=ft.Colors.GREY_700)])))
         for estudo in estudos:
             self.area.controls.append(self._cartao_estudo(estudo, materias))
 
@@ -149,7 +149,7 @@ class PrincipalView:
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
                     ft.Column(tight=True, spacing=2, controls=[ft.Text(str(valor), size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.INDIGO_900), ft.Text(rotulo, size=12, color=ft.Colors.GREY_600)]),
-                    ft.Container(width=38, height=38, border_radius=12, bgcolor=cor if False else ft.Colors.INDIGO_50, alignment=ft.alignment.center, content=ft.Icon(ft.Icons.TRENDING_UP_ROUNDED, color=ft.Colors.INDIGO_600, size=20)),
+                    ft.Container(width=38, height=38, border_radius=12, bgcolor=cor if False else ft.Colors.INDIGO_50, alignment=ft.Alignment.CENTER, content=ft.Icon(ft.Icons.TRENDING_UP_ROUNDED, color=ft.Colors.INDIGO_600, size=20)),
                 ],
             ),
         )

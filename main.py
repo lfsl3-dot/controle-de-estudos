@@ -9,7 +9,6 @@ import socket
 
 import flet as ft
 import fastapi
-import flet.controls.alignment as alignment_module
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -20,14 +19,6 @@ from views.principal_view import PrincipalView
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__) 
-
-# Flet 1.0.1 exposes uppercase alignment constants, while some render paths
-# may still call the legacy lowercase API. Keep both compatible.
-if not hasattr(alignment_module, "center"):
-    alignment_module.center = lambda: alignment_module.Alignment(0, 0)
-if not hasattr(alignment_module.Alignment, "center"):
-    alignment_module.Alignment.center = staticmethod(lambda: alignment_module.Alignment(0, 0))
-
 
 class CabecalhosSeguranca(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
@@ -101,36 +92,6 @@ def main(page: ft.Page):
     page.fonts = {"Inter": "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTcviYwY.woff2"}
     page.theme = ft.Theme(font_family="Inter", color_scheme_seed=ft.Colors.INDIGO)
 
-    # Compatibilidade com versões anteriores que usam ft.alignment.center,
-    # e com Flet 1.0.1 que expõe Alignment.CENTER.
-    def _alignment_center():
-        return alignment_module.Alignment(0, 0)
-
-    if not hasattr(alignment_module, "center"):
-        alignment_module.center = _alignment_center
-    if not hasattr(alignment_module.Alignment, "center"):
-        alignment_module.Alignment.center = staticmethod(_alignment_center)
-
-    if not hasattr(ft, "alignment"):
-        ft.alignment = alignment_module
-    else:
-        for nome in ("center", "top_center", "top_left", "top_right",
-                     "bottom_center", "bottom_left", "bottom_right",
-                     "center_left", "center_right"):
-            if not hasattr(ft.alignment, nome):
-                valor = {
-                    "center": _alignment_center,
-                    "top_center": lambda: alignment_module.Alignment(0, -1),
-                    "top_left": lambda: alignment_module.Alignment(-1, -1),
-                    "top_right": lambda: alignment_module.Alignment(1, -1),
-                    "bottom_center": lambda: alignment_module.Alignment(0, 1),
-                    "bottom_left": lambda: alignment_module.Alignment(-1, 1),
-                    "bottom_right": lambda: alignment_module.Alignment(1, 1),
-                    "center_left": lambda: alignment_module.Alignment(-1, 0),
-                    "center_right": lambda: alignment_module.Alignment(1, 0),
-                }[nome]
-                setattr(ft.alignment, nome, valor)
-
     try:
         controller = AppController()
     except Exception:
@@ -138,7 +99,7 @@ def main(page: ft.Page):
         page.add(
             ft.Container(
                 expand=True,
-                alignment=ft.alignment.center,
+                alignment=ft.Alignment.CENTER,
                 bgcolor=ft.Colors.SURFACE,
                 content=ft.Text("Sistema indisponível no momento. Tente novamente mais tarde."),
             )
@@ -174,11 +135,11 @@ def main(page: ft.Page):
                         height=38,
                         border_radius=12,
                         gradient=ft.LinearGradient(
-                            begin=ft.alignment.top_left,
-                            end=ft.alignment.bottom_right,
+                            begin=ft.Alignment.TOP_LEFT,
+                            end=ft.Alignment.BOTTOM_RIGHT,
                             colors=[ft.Colors.INDIGO_600, ft.Colors.BLUE_500],
                         ),
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         content=ft.Icon(ft.Icons.MENU_BOOK, color=ft.Colors.WHITE, size=20),
                     ),
                     ft.Text("Controle de Estudos", weight=ft.FontWeight.BOLD, size=18),
