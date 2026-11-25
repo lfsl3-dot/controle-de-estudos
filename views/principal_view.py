@@ -21,10 +21,11 @@ def _data_br(texto: str | None) -> str:
 
 
 class PrincipalView:
-    def __init__(self, page: ft.Page, controller, ao_sessao_perdida):
+    def __init__(self, page: ft.Page, controller, ao_sessao_perdida, ao_sair=None):
         self.page = page
         self.controller = controller
         self.ao_sessao_perdida = ao_sessao_perdida
+        self.ao_sair = ao_sair
         self.secao = "estudos"
         self.menu = ft.Row(spacing=8, wrap=True)
         self.area = ft.Column(expand=True, scroll=ft.ScrollMode.AUTO, spacing=14)
