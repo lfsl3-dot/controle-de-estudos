@@ -39,7 +39,7 @@ class PrincipalView:
         return ft.Container(
             expand=True,
             bgcolor=ft.Colors.SURFACE,
-            padding=ft.padding.symmetric(horizontal=24, vertical=18),
+            padding=ft.Padding.symmetric(horizontal=24, vertical=18),
             alignment=ft.Alignment.TOP_CENTER,
             content=ft.Container(expand=True, width=1100, content=self.raiz),
         )
@@ -76,8 +76,8 @@ class PrincipalView:
                 ft.Container(
                     border_radius=12,
                     bgcolor=ft.Colors.INDIGO_600 if ativa else ft.Colors.WHITE,
-                    border=ft.border.all(1, ft.Colors.INDIGO_200 if ativa else ft.Colors.GREY_300),
-                    padding=ft.padding.symmetric(horizontal=14, vertical=8),
+                    border=ft.Border.all(1, ft.Colors.INDIGO_200 if ativa else ft.Colors.GREY_300),
+                    padding=ft.Padding.symmetric(horizontal=14, vertical=8),
                     ink=True,
                     on_click=lambda e, c=chave: self._ir_para(c),
                     content=ft.Row(
@@ -123,7 +123,7 @@ class PrincipalView:
             )
         )
         if not materias:
-            self.area.controls.append(ft.Container(padding=12, border_radius=12, bgcolor=ft.Colors.ORANGE_50, border=ft.border.all(1, ft.Colors.ORANGE_100), content=ft.Row(spacing=8, controls=[ft.Icon(ft.Icons.INFO_OUTLINE, color=ft.Colors.ORANGE_800, size=18), ft.Text("Cadastre uma matéria na aba “Matérias” antes de criar seus estudos.", color=ft.Colors.ORANGE_900, size=13)])))
+            self.area.controls.append(ft.Container(padding=12, border_radius=12, bgcolor=ft.Colors.ORANGE_50, border=ft.Border.all(1, ft.Colors.ORANGE_100), content=ft.Row(spacing=8, controls=[ft.Icon(ft.Icons.INFO_OUTLINE, color=ft.Colors.ORANGE_800, size=18), ft.Text("Cadastre uma matéria na aba “Matérias” antes de criar seus estudos.", color=ft.Colors.ORANGE_900, size=13)])))
         self.area.controls.append(
             ft.Row(wrap=True, spacing=10, controls=[
                 self._bloco_resumo(resumo["pendente"], "Pendentes", ft.Colors.ORANGE),
@@ -133,7 +133,7 @@ class PrincipalView:
             ])
         )
         if not estudos:
-            self.area.controls.append(ft.Container(padding=20, border_radius=14, bgcolor=ft.Colors.WHITE, border=ft.border.all(1, ft.Colors.GREY_200), alignment=ft.Alignment.CENTER, content=ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, tight=True, controls=[ft.Icon(ft.Icons.MENU_BOOK_OUTLINED, size=38, color=ft.Colors.INDIGO_300), ft.Text("Nenhum estudo cadastrado ainda", weight=ft.FontWeight.W_600, color=ft.Colors.GREY_700)])))
+            self.area.controls.append(ft.Container(padding=20, border_radius=14, bgcolor=ft.Colors.WHITE, border=ft.Border.all(1, ft.Colors.GREY_200), alignment=ft.Alignment.CENTER, content=ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER, tight=True, controls=[ft.Icon(ft.Icons.MENU_BOOK_OUTLINED, size=38, color=ft.Colors.INDIGO_300), ft.Text("Nenhum estudo cadastrado ainda", weight=ft.FontWeight.W_600, color=ft.Colors.GREY_700)])))
         for estudo in estudos:
             self.area.controls.append(self._cartao_estudo(estudo, materias))
 
@@ -144,7 +144,7 @@ class PrincipalView:
             padding=14,
             border_radius=14,
             bgcolor=ft.Colors.WHITE,
-            border=ft.border.all(1, ft.Colors.GREY_200),
+            border=ft.Border.all(1, ft.Colors.GREY_200),
             content=ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[

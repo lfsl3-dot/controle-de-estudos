@@ -147,10 +147,10 @@ def main(page: ft.Page):
             center_title=False,
             actions=[
                 ft.Container(
-                    border=ft.border.all(1, ft.Colors.INDIGO_100),
+                    border=ft.Border.all(1, ft.Colors.INDIGO_100),
                     border_radius=20,
                     bgcolor=ft.Colors.INDIGO_50,
-                    padding=ft.padding.symmetric(horizontal=12, vertical=8),
+                    padding=ft.Padding.symmetric(horizontal=12, vertical=8),
                     content=ft.Row(
                         tight=True,
                         spacing=6,
